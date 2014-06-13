@@ -20,7 +20,7 @@ To enable this behavior, add the following to your configuration:
 
 ## Manual
 
-Download complete package from http://github.com/luisfarzati/angulartics/archive/master.zip
+Download complete package from http://github.com/dasmith/angulartics/archive/master.zip
 
 ## NuGet
 
