@@ -1,7 +1,21 @@
 angulartics
 ===========
 
-Vendor-agnostic analytics for AngularJS applications. [luisfarzati.github.io/angulartics](http://luisfarzati.github.io/angulartics "Go to the website")
+**MODIFIED FORK OF** [luisfarzati.github.io/angulartics]'s vendor-agnostic analytics for AngularJS applications.  The modifications support websites that do not use Angular `routes` or `states` on every page and want to track full paths.  The modifications lead to the following behavior:
+
+  - **Viewing page `http://host.com/routes#/route` will be tracked as `/page#/route`.** The original version would only track the page as `/route`
+	- **Viewing page `http://host.com/noroutes` will be tracked as `/noroutes`.**  This is useful for pages that do not contain Angular code besides initializing the base module.
+	- **Viewing page `http://host.com/routes2` that loads a default route and changes the path to `http://host.com/routes2#/` will be tracked as `/routes2#/`.** And only this one tracking event will be recorded.
+
+To enable this behavior, add the following to your configuration:
+
+		...
+		var yourApp = angular.module('YourApp', ['angulartics', 'angulartics.google.analytics'])
+		    .config(function ($analyticsProvider) {
+		        $analyticsProvider.firstPageview(true); /* Records pages that don't use $state or $route */
+		        $analyticsProvider.withAutoBase(true);  /* Records full path */
+		});
+
 
 # Install
 
