@@ -21,7 +21,6 @@ angular.module('angulartics.google.analytics', ['angulartics'])
   $analyticsProvider.settings.trackRelativePath = true;
 
   $analyticsProvider.registerPageTrack(function (path) {
-    console.log(path);
     if (window._gaq) _gaq.push(['_trackPageview', path]);
     if (window.ga) ga('send', 'pageview', path);
   });
@@ -48,7 +47,7 @@ angular.module('angulartics.google.analytics', ['angulartics'])
     if (window._gaq) {
       _gaq.push(['_trackEvent', properties.category, action, properties.label, properties.value, properties.noninteraction]);
     }
-    else if (window.ga) {
+    if (window.ga) {
       if (properties.noninteraction) {
         ga('send', 'event', properties.category, action, properties.label, properties.value, {nonInteraction: 1});
       } else {
