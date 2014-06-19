@@ -76,7 +76,7 @@ angular.module('angulartics', [])
   
   function eventTrack(event, properties) {
     angular.forEach(eventTrackers, function(fn) {
-      fn({name: event, properties: properties});
+      fn(event, properties);
     });
   }
 
