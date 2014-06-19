@@ -61,43 +61,134 @@ angular.module('angulartics', [])
     cache.setUserPropertiesOnce.push(properties);
   };
 
+  var pageTrackers = [bufferedPageTrack];
+  var eventTrackers = [bufferedEventTrack];
+  var setUsernameList = [bufferedSetUsername];
+  var setUserPropertiesList = [bufferedSetUserProperties];
+  var setUserPropertiesOnceList = [bufferedSetUserPropertiesOnce];
+    
+
+  function pageTrack(path) {
+    angular.forEach(pageTrackers, function(fn) {
+      fn(path);
+    });
+  }
+  
+  function eventTrack(event) {
+    angular.forEach(eventTrackers, function(fn) {
+      fn({event.name, event.properties});
+    });
+  }
+
+  function setUsername(name) {
+    angular.forEach(setUsernameList, function(fn) {
+      fn(name);
+    });
+  }
+
+  function setUserProperties(properties) {
+    angular.forEach(setUserPropertiesList, function(fn) {
+      fn(properties);
+    });
+  }
+  
+  function setUserPropertiesOnce(properties) {
+    angular.forEach(setUserPropertiesOnceList, function(fn) {
+      fn(properties);
+    });
+  }
+
   var api = {
     settings: settings,
-    pageTrack: bufferedPageTrack,
-    eventTrack: bufferedEventTrack,
-    setUsername: bufferedSetUsername,
-    setUserProperties: bufferedSetUserProperties,
-    setUserPropertiesOnce: bufferedSetUserPropertiesOnce
+    pageTrack: pageTrack,
+    eventTrack: eventTrack,
+    setUsername: setUsername,
+    setUserProperties: setUserProperties,
+    setUserPropertiesOnce: setUserPropertiesOnce
   };
 
   var registerPageTrack = function (fn) {
-    api.pageTrack = fn;
+
+    // remove buffered tracker if exists
+    var index = pageTrackers.indexOf(bufferedPageTrack);
+    if (index >= 0) {
+      pageTrackers.splice(index, 1);
+    }
+    pageTrackers.push(fn);
+    
     angular.forEach(cache.pageviews, function (path, index) {
-      setTimeout(function () { api.pageTrack(path); }, index * settings.pageTracking.bufferFlushDelay);
+      setTimeout(function () { 
+        
+        // to avoid multiple trackers executing
+        fn(path);
+      }, index * settings.pageTracking.bufferFlushDelay);
     });
   };
   var registerEventTrack = function (fn) {
-    api.eventTrack = fn;
+    
+    // remove buffered tracker if exists
+    var index = eventTrackers.indexOf(bufferedEventTrack);
+    if (index >= 0) {
+      eventTrackers.splice(index, 1);
+    }
+    eventTrackers.push(fn);
+    
     angular.forEach(cache.events, function (event, index) {
-      setTimeout(function () { api.eventTrack(event.name, event.properties); }, index * settings.eventTracking.bufferFlushDelay);
+      setTimeout(function () { 
+        
+        // to avoid multiple trackers executing
+        fn(event.name, event.properties); 
+      }, index * settings.eventTracking.bufferFlushDelay);
     });
   };
   var registerSetUsername = function (fn) {
-    api.setUsername = fn;
+    
+    // remove buffered tracker if exists
+    var index = setUsernameList.indexOf(bufferedSetUsername);
+    if (index >= 0) {
+      setUsernameList.splice(index, 1);
+    }
+    setUsernameList.push(fn);
+    
     angular.forEach(cache.setUsername, function (name, index) {
-      setTimeout(function () { api.setUsername(name); }, index * settings.pageTracking.bufferFlushDelay);
+      setTimeout(function () { 
+        
+        // to avoid multiple trackers executing
+        fn(name); 
+      }, index * settings.pageTracking.bufferFlushDelay);
     });
   };
   var registerSetUserProperties = function (fn) {
-    api.setUserProperties = fn;
+    
+    // remove buffered tracker if exists
+    var index = setUserPropertiesList.indexOf(bufferedSetUserProperties);
+    if (index >= 0) {
+      setUserPropertiesList.splice(index, 1);
+    }
+    setUserPropertiesList.push(fn);
+    
     angular.forEach(cache.setUserProperties, function (properties, index) {
-      setTimeout(function () { api.setUserProperties(properties); }, index * settings.pageTracking.bufferFlushDelay);
+      setTimeout(function () { 
+        
+        // to avoid multiple trackers executing
+        fn(properties); 
+      }, index * settings.pageTracking.bufferFlushDelay);
     });
   };
+  
   var registerSetUserPropertiesOnce = function (fn) {
-    api.setUserPropertiesOnce = fn;
+    
+    // remove buffered tracker if exists
+    var index = setUserPropertiesOnceList.indexOf(bufferedSetUserPropertiesOnce);
+    if (index >= 0) {
+      setUserPropertiesOnceList.splice(index, 1);
+    }
+    setUserPropertiesOnceList.push(fn);
+    
     angular.forEach(cache.setUserPropertiesOnce, function (properties, index) {
-      setTimeout(function () { api.setUserPropertiesOnce(properties); }, index * settings.pageTracking.bufferFlushDelay);
+      setTimeout(function () { 
+        fn(properties); 
+      }, index * settings.pageTracking.bufferFlushDelay);
     });
   };
 
